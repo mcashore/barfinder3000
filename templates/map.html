@@ -31,7 +31,20 @@
         return JSON.parse(rText)['json-data'];
       };
 
-      function processData(stuff){
+      function processData(deals){
+        var googleData = [['Lat', 'Lon', 'Info']]
+        for(var i = 0; i < deals.length; i++) {
+          var deal = deals[i];
+          var info = "";
+          info += "bar_name: " + deal[4] + "\n";
+          info += "drink_name: " + deal[2] + "\n";
+          info += "price: " + deal[1] + "\n";
+          info += "category: " + deal[3];
+          googleData.push([deal[5], deal[6], info]);
+        }
+        return googleData; /*
+
+
       	var b = [['Lat','Lon','Info']];
         for (bar in stuff){
         	var c = [];
@@ -56,7 +69,7 @@
         	c.push(iinfo);
 			b.push(c);
         }
-        return b;
+        return b;*/
       };
 
       function filter(locx,locy,spend,category,distance){
