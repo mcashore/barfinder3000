@@ -9,7 +9,8 @@
 
     var stuff,
         omgData,
-        map;
+        map,
+        heatmap;
 
     /**
      * getUserCoordinates - use geolocation to grab the user's latitude and longitude
@@ -105,7 +106,7 @@
     }
 
     function addHeatMap() {
-      var heatmap = new HeatmapOverlay(map, {
+      heatmap = new HeatmapOverlay(map, {
         "radius":30,
         "visible":true,
         "opacity":60
@@ -133,6 +134,9 @@
     function drawMap() {
       //var data = google.visualization.arrayToDataTable(processData(stuff));
       initializeMap();
+      addHeatMap();
+      alert('hi');
+      addDotsToMap();
       /*
       map = new google.visualization.Map($('#map_div')[0]);
       map.draw(data, {showTip: true, mapType: 'normal'});
@@ -152,19 +156,13 @@
       });
     });
 
-    function initializeMap(lat, lng) {
+    function addDotsToMap() {
       var data = stuff;
       var locations = [];
 
       for(var i = 0; i < data.length; i++) {
-        locations.push([data[i][4], data[i][5], data[i][6]]);
+        locations.push([data[i][4] + "<br>price: $" + data[i][1] , data[i][5], data[i][6]]);
       }
-
-      var myMap = new google.maps.Map(document.getElementById('map_div'), {
-        zoom: 14,
-        center: new google.maps.LatLng(43.6529, -79.40124),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      });
 
       var infowindow = new google.maps.InfoWindow();
 
@@ -173,23 +171,44 @@
       for (i = 0; i < locations.length; i++) {
         marker = new google.maps.Marker({
           position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-          map: myMap
+          map: map
         });
 
         google.maps.event.addListener(marker, 'click', (function(marker, i) {
           return function() {
             infowindow.setContent(locations[i][0]);
-            infowindow.open(myMap, marker);
+            infowindow.open(map, marker);
           }
         })(marker, i));
       }
+
+    }
+
+    function initializeMap(lat, lng) {
+
+
+      var myMap = new google.maps.Map(document.getElementById('map_div'), {
+        zoom: 14,
+        center: new google.maps.LatLng(43.6529, -79.40124),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
       map = myMap;
-      addHeatMap();
+    }
+
+    function toggleHeatmap() {
+      if(document.getElementById('heatmap').checked) {
+        addHeatMap();
+      } else {
+        initializeMap();
+      }
     }
 
     google.setOnLoadCallback(drawMap);
     var stuff = getData();
-
+    //document.addEventListener('DOMContentLoaded', function() {
+    //  document.getElementById('heatmap').addEventListener('onchange', function() {alert('hello');});
+    //});
     </script>
   </head>
 
@@ -202,6 +221,7 @@
 		<input id="beer_submit" type="submit" value="submit" />
 	</form>
     <div id="map_div" style="width: 75%; height: 75%"></div>
+    <input id='heatmap' type="checkbox" onclick='toggleHeatmap()'>Heatmap</input>
     <div id="list"></div>
   </body>
 </html>
