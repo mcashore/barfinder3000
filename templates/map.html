@@ -129,7 +129,12 @@
 
       google.maps.event.addListener(map, 'idle', function() {
         heatmap.setDataSet(testData);
+        // make sure these things are redrawn after a filter
+        if(document.getElementById('heatmap').checked) {
+          if(heatmap) heatmap.toggle();
+        }
       });
+      console.log('leaving...');
     }
 
     function removeHeatmap() {
@@ -139,6 +144,8 @@
     }
 
     function drawMap() {
+      removeDotsFromMap();
+
       //var data = google.visualization.arrayToDataTable(processData(stuff));
       initializeMap();
       addHeatMap();
@@ -157,7 +164,12 @@
         console.log("bitches");
         console.log(stuff);
         drawMap();
+
         e.preventDefault();
+
+        if(document.getElementById('dots').checked) {
+          addDotsToMap();
+        }
       });
     });
 
