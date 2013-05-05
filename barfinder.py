@@ -1,7 +1,7 @@
 # imports
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+     abort, render_template, flash, jsonify
 from contextlib import closing
 from drink_deal import DrinkDeal
 
@@ -37,12 +37,16 @@ def add_drink_deal():
   flash('New bar was created')
   return redirect(url_for('show_drink_deals'))
 
+@app.route('/show_map', methods=['GET'])
+def show_map():
+  return render_template('map.html')
+
 @app.route('/get_drinks_json', methods=['GET'])
 def drink_json_data():
   data = []
   for deal in DrinkDeal.all_deals(g.db):
     data.append(deal.to_arr())
-  return flask.jsonify(data)
+  return jsonify([('json-data',data)])
 
 if __name__ == '__main__':
   app.run()

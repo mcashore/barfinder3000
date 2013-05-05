@@ -37,6 +37,8 @@ class DrinkDeal:
       return
     db.execute('delete from drink_deals where id=?', [self.id])
 
+  def to_arr(self):
+    return [self.day, self.drink_cost, self.drink_name, self.drink_category, self.bar_name, self.bar_lat, self.bar_lon]
 
   @staticmethod
   def all_deals(db):

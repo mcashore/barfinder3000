@@ -7,12 +7,12 @@
 	  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
 		var R = 6371; // Radius of the earth in km
 		var dLat = deg2rad(lat2-lat1);  // deg2rad below
-		var dLon = deg2rad(lon2-lon1); 
-		var a = 
+		var dLon = deg2rad(lon2-lon1);
+		var a =
 		Math.sin(dLat/2) * Math.sin(dLat/2) +
-		Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-		Math.sin(dLon/2) * Math.sin(dLon/2); 
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+		Math.sin(dLon/2) * Math.sin(dLon/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 		var d = R * c; // Distance in km
 		return d;
 	  };
@@ -22,8 +22,13 @@
 	  };
 
       function getData(){
-      	var twoDay = new Date();
-        return $.getJSON(masseyURL,{day:twoDay.getDay()})["shit"];
+      	var jData = $.ajax({
+          dataType: "json",
+          url: "/get_drinks_json",
+          async: false
+        });
+        var rText = jData.responseText;
+        return JSON.parse(rText)['json-data'];
       };
 
       function processData(stuff){
@@ -60,22 +65,24 @@
       	/*filter list of shit*/
       	shit = [];
       	for (bar in stuff){
-      		if 
+
       	}
       	console.log(shit);
       };
 
       google.load("visualization", "1", {packages:["map"]});
       google.setOnLoadCallback(drawMap);
-      /*var stuff = getData();*/
+      var stuff = getData();
       function drawMap() {
-        var data = google.visualization.arrayToDataTable([
+        var data = google.visualization.arrayToDataTable(processData(stuff));
+
+          /*[
           ['Lat', 'Lon', 'Info'],
           [37.4238, -122.0853, 'Work'],
-          /*[37.4289, -122.1697, 'University'],
+          [37.4289, -122.1697, 'University'],
           [37.6153, -122.3900, 'Airport'],
-          [37.4422, -122.1731, 'Shopping']*/
-        ]);
+          [37.4422, -122.1731, 'Shopping']
+        ]);*/
 
         var map = new google.visualization.Map($('#map_div')[0]);
         map.draw(data, {showTip: true});
@@ -98,7 +105,7 @@
 		Spend: <input type="text" id="spend" name="spend">
 		distance: <input type="text" id="distance" name="distance">
 		Category: <input type="text" id="cat" name="cat">
-		<input id="beer_submit" type="submit" value="submit" /> 
+		<input id="beer_submit" type="submit" value="submit" />
 	</form>
     <div id="map_div" style="width: 75%; height: 75%"></div>
     <div id="list"></div>
