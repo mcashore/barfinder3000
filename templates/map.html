@@ -11,7 +11,8 @@
         omgData,
         map,
         heatmap,
-        markersArray = [];
+        markersArray = [],
+        heatmapOn=false;
 
     /**
      * getUserCoordinates - use geolocation to grab the user's latitude and longitude
@@ -92,6 +93,41 @@
       }
       console.log("nrs.");
       console.log(shit);
+
+      /*Print shit onto div element*/
+      topfive = [];
+      for (var i = 0; i< shit.length; i++){
+        var bar = shit[i];
+        var dist = getDistanceFromLatLonInKm(lat1,lng1,bar[5],bar[6]);
+        if (topfive.length <= 5){
+          var pos = 0
+          for (otherBar in topfive){
+            if (dist >= otherBar[1]){
+              pos += 1;
+            }
+          }
+          topfive.splice(pos,0,[bar,dist]);
+        }
+        else if (dist < topfive[4][1]){
+          for (otherBar in topfive){
+            if (dist >= otherBar[1]){
+              pos += 1;
+            }
+          }
+          topfive.splice(pos,0,[bar,dist]);
+          topfive.pop();
+        }
+      }
+
+      $('#list').empty();
+      for(var i = 0; i < topfive.length; i ++){
+        crap = topfive[i];
+        //console.log(topfive);
+        $('#list').append(crap[0][4] + " ")
+        $('#list').append(crap[0][1] + " ")
+        $('#list').append(parseInt(crap[1]) + "<br>")
+      }
+
       return shit;
     };
 
@@ -131,19 +167,28 @@
         heatmap.setDataSet(testData);
         // make sure these things are redrawn after a filter
         if(document.getElementById('heatmap').checked) {
-          if(heatmap) heatmap.toggle();
+          showHeatmap();
         }
       });
       console.log('leaving...');
     }
 
-    function removeHeatmap() {
-      if(heatmap) {
-        heatmap.visible = false;
+    function showHeatmap() {
+      if(!heatmapOn && heatmap) {
+        heatmap.toggle();
+        heatmapOn = true;
+      }
+    }
+
+    function hideHeatmap() {
+      if(heatmapOn && heatmap) {
+        heatmap.toggle();
+        heatmapOn = false;
       }
     }
 
     function drawMap() {
+      heatmapOn = false;
       removeDotsFromMap();
 
       //var data = google.visualization.arrayToDataTable(processData(stuff));
@@ -222,7 +267,11 @@
     }
 
     function toggleHeatmap() {
-      if(heatmap) heatmap.toggle();
+      if(document.getElementById('heatmap').checked) {
+        showHeatmap();
+      } else {
+        hideHeatmap();
+      }
     }
 
     function toggleDots() {
@@ -232,6 +281,8 @@
         addDotsToMap();
       }
     }
+
+
 
     google.setOnLoadCallback(drawMap);
     var stuff = getData();
