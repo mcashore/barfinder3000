@@ -27,17 +27,22 @@ def teardown_request(exception):
 
 @app.route('/')
 def show_drink_deals():
-  cur = g.db.execute('select name from bars order by id desc')
-  bars = [row[0] for row in cur.fetchall()]
-  return render_template('show_bars.html', bars=bars)
+  drink_deals = DrinkDeal.all_deals(g.db)
+  return render_template('show_drink_deals.html', drink_deals=drink_deals)
 
 @app.route('/add_drink_deal', methods=['POST'])
 def add_drink_deal():
-  g.db.execute('insert into bars (name, latitude, longitude) values (?, ?, ?)',
-                [request.form['name'], request.form['latitude'], request.form['longitude']])
-  g.db.commit()
+  deal = DrinkDeal((request.form['day'], request.form['drink_cost'], request.form['drink_name'], request.form['drink_category'], request.form['bar_name'], request.form['bar_lat'], request.form['bar_lon']))
+  deal.save(g.db)
   flash('New bar was created')
-  return redirect(url_for('show_bars'))
+  return redirect(url_for('show_drink_deals'))
+
+@app.route('/get_drinks_json', methods=['GET'])
+def drink_json_data():
+  data = []
+  for deal in DrinkDeal.all_deals(g.db):
+    data.append(deal.to_arr())
+  return flask.jsonify(data)
 
 if __name__ == '__main__':
   app.run()

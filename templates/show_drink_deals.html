@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block body %}
+  <form action="{{ url_for('add_drink_deal') }}" method=post class=add-bar>
+    <dl>
+      <dt>Day of the Deal (Sunday=0, Monday=1, ..., Saturday=6):
+      <dd><input type=text size=30 name="day">
+      <dt>Cost of the Drink:
+      <dd><input type=text size=30 name="drink_cost">
+      <dt>Name of the Drink:
+      <dd><input type=text size=30 name="drink_name">
+      <dt>Category of Drink (Beer = 0, Wine = 1, Spirit = 2):
+      <dd><input type=text size=30 name="drink_category">
+      <dt>Name of the Bar:
+      <dd><input type=text size=30 name="bar_name">
+      <dt>Latitude of the Bar:
+      <dd><input type=text size=30 name="bar_lat">
+      <dt>Longitude of the Bar:
+      <dd><input type=text size=30 name="bar_lon">
+      <dd><input type=submit value=Share>
+    </dl>
+  </form>
+  <ul class=entries>
+  {% for deal in drink_deals %}
+    <li>
+      <h2>Deal For {{ deal.bar_name }}</h2><br />
+      <p>Drink Name: {{ deal.drink_name}}, cost: {{ deal.drink_cost }}</p><br />
+      <p>Drink Category: {{ deal.drink_category }}</p><br />
+      <p>Bar Latitude/Longitude:  {{ deal.bar_lat }} / {{ deal.bar_lon }}</p>
+    </li>
+  {% else %}
+    <li><em>Unbelievable.  Mo entries here so far</em></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
