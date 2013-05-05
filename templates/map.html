@@ -3,9 +3,12 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBotXinXKyP_GwZj1gkosyr96gGAdw6ahQ&sensor=false"></script>
+    <script src="https://raw.github.com/pa7/heatmap.js/master/src/heatmap-gmaps.js"></script>
+    <script src="https://raw.github.com/pa7/heatmap.js/master/src/heatmap.js"></script>
     <script>
 
     var stuff,
+        omgData,
         map;
 
     /**
@@ -42,7 +45,8 @@
         async: false
       });
       var rText = jData.responseText;
-      return JSON.parse(rText)['json-data'];
+      omgData = JSON.parse(rText)['json-data'];
+      return omgData;
     };
 
     function processData(deals){
@@ -60,6 +64,7 @@
     };
 
     function filter(address,spend,category,distance){
+      console.log("chyeaaaaaah buoi");
       /*Turn street address into lat and long*/
       var addressShit = $.ajax({
         url: 'http://maps.googleapis.com/maps/api/geocode/json',
@@ -73,6 +78,8 @@
       var lat1 = JSON.parse(addressShit.responseText)['results'][0]['geometry']['location']['lat'];
       var lng1 = JSON.parse(addressShit.responseText)['results'][0]['geometry']['location']['lng'];
 
+      console.log("what what in the hizziiiiiiieeeeee");
+
       /*filter list of shit*/
       shit = [];
       for(var i = 0; i < stuff.length; i++){
@@ -81,6 +88,8 @@
           shit.push(bar);
         }
       }
+      console.log("nrs.");
+      console.log(shit);
       return shit;
     };
 
@@ -95,27 +104,92 @@
       })
     }
 
+    function addHeatMap() {
+      var heatmap = new HeatmapOverlay(map, {
+        "radius":30,
+        "visible":true,
+        "opacity":60
+      });
+
+      var testData = {
+        max: 50,
+        data: []
+      };
+
+      for(var i = 0; i < stuff.length; i++) {
+        var dat = stuff[i];
+        var testDatum = {};
+        testDatum['lat'] = dat[5];
+        testDatum['lng'] = dat[6];
+        testDatum['count'] = 100 * (1/dat[1]);
+        testData['data'].push(testDatum);
+      }
+
+      google.maps.event.addListener(map, 'idle', function() {
+        heatmap.setDataSet(testData);
+      });
+    }
+
     function drawMap() {
-      var data = google.visualization.arrayToDataTable(processData(stuff));
+      //var data = google.visualization.arrayToDataTable(processData(stuff));
+      initializeMap();
+      /*
       map = new google.visualization.Map($('#map_div')[0]);
       map.draw(data, {showTip: true, mapType: 'normal'});
       getUserCoordinates(addLocator);
       console.log('YATRICK');
       console.log(stuff);
+      addHeatMap();*/
     };
 
     $(function(){
       $('form').submit(function(e){
         stuff = filter($('#address').val(),parseFloat($('#spend').val()),parseFloat($('#cat').val()),parseFloat($('#distance').val()));
+        console.log("bitches");
         console.log(stuff);
         drawMap();
         e.preventDefault();
       });
     });
 
-    google.load("visualization", "1", {packages:["map"]});
+    function initializeMap(lat, lng) {
+      var data = stuff;
+      var locations = [];
+
+      for(var i = 0; i < data.length; i++) {
+        locations.push([data[i][4], data[i][5], data[i][6]]);
+      }
+
+      var myMap = new google.maps.Map(document.getElementById('map_div'), {
+        zoom: 14,
+        center: new google.maps.LatLng(43.6529, -79.40124),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      var infowindow = new google.maps.InfoWindow();
+
+      var marker, i;
+
+      for (i = 0; i < locations.length; i++) {
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+          map: myMap
+        });
+
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infowindow.setContent(locations[i][0]);
+            infowindow.open(myMap, marker);
+          }
+        })(marker, i));
+      }
+      map = myMap;
+      addHeatMap();
+    }
+
     google.setOnLoadCallback(drawMap);
     var stuff = getData();
+
     </script>
   </head>
 
