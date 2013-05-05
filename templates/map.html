@@ -47,15 +47,25 @@
         return googleData;
       };
 
-      function filter(street1,street2,spend,category,distance){
+      function filter(address,spend,category,distance){
       	/*Turn street address into lat and long*/
-        var curx = 1;
-        var cury = 2;
+        var addressShit = $.ajax({
+          url: 'http://maps.googleapis.com/maps/api/geocode/json',
+          data: {
+            sensor: false,
+            address: address
+          },
+          async: false
+        });
+
+        var lat1 = JSON.parse(addressShit.responseText)['results'][0]['geometry']['location']['lat'];
+        var lng1 = JSON.parse(addressShit.responseText)['results'][0]['geometry']['location']['lng'];
 
       	/*filter list of shit*/
       	shit = [];
-      	for (bar in stuff){
-          if (getDistanceFromLatLonInKm(curx,bar[5],cury,bar[6]) < distance && category == bar[3] && spend == bar[1]){
+      	for(var i = 0; i < stuff.length; i++){
+          var bar = stuff[i];
+          if (getDistanceFromLatLonInKm(lat1,lng1,bar[5],bar[6]) < distance && category == bar[3] && spend >= bar[1]){
             shit.push(bar);
           }
       	}
@@ -71,7 +81,7 @@
       $(function(){
 	      $('form').submit(function(e){
 
-			filter($('#street1').val(),$('#street2').val(),parseFloat($('#spend').val()),parseInt($('#category').val()),parseFloat($('#distance').val()));
+			filter($('#address').val(),parseFloat($('#spend').val()),parseFloat($('#cat').val()),parseFloat($('#distance').val()));
 	    	e.preventDefault();
 		  });
 		});
@@ -84,8 +94,7 @@
 
   <body>
   	<form>
-		Street1: <input type="text" id="street1" name="locx">
-		Street2: <input type="text" id="street2" name="locy">
+		Address: <input type="text" id="address" name="address">
 		Spend: <input type="text" id="spend" name="spend">
 		Distance (KM): <input type="text" id="distance" name="distance">
 		Category: <input type="text" id="cat" name="cat">
