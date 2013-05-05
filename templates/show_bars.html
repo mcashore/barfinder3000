@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+  <form action="{{ url_for('add_bar') }}" method=post class=add-bar>
+    <dl>
+      <dt>Bar Name:
+      <dd><input type=text size=30 name=name>
+      <dt>Latitude:
+      <dd><input type=text size=30 name=latitude>
+      <dt>Longitude:
+      <dd><input type=text size=30 name=longitude>
+      <dd><input type=submit value=Share>
+    </dl>
+  </form>
+  <ul class=entries>
+  {% for bar in bars %}
+    <li><h2>{{ bar[0] }}</h2>{{ bar[1] }}{{ bar.longitude }}
+  {% else %}
+    <li><em>Unbelievable.  Mo entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
