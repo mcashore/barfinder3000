@@ -42,34 +42,7 @@
           info += "category: " + deal[3];
           googleData.push([deal[5], deal[6], info]);
         }
-        return googleData; /*
-
-
-      	var b = [['Lat','Lon','Info']];
-        for (bar in stuff){
-        	var c = [];
-        	var iinfo = "";
-        	for(var i = 0; i< bar.length; i++){
-				if (i == 0 || i == 1){
-					c.push(bar[i]);
-				}
-				if (i == 3){
-					iinfo += ("bar :" + bar[i] + " ");
-				}
-				if (i == 4){
-					iinfo += ("drink : " + bar[i] + " ");
-				}
-				if (i == 5){
-					iinfo += ("price : " + bar[i] + " ");
-				}
-				if (i == 6){
-					iinfo += ("category : " + bar[i] + " ");
-				}
-        	}
-        	c.push(iinfo);
-			b.push(c);
-        }
-        return b;*/
+        return googleData;
       };
 
       function filter(locx,locy,spend,category,distance){
