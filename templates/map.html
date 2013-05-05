@@ -10,7 +10,8 @@
     var stuff,
         omgData,
         map,
-        heatmap;
+        heatmap,
+        markersArray = [];
 
     /**
      * getUserCoordinates - use geolocation to grab the user's latitude and longitude
@@ -108,7 +109,7 @@
     function addHeatMap() {
       heatmap = new HeatmapOverlay(map, {
         "radius":30,
-        "visible":true,
+        "visible":false,
         "opacity":60
       });
 
@@ -131,12 +132,16 @@
       });
     }
 
+    function removeHeatmap() {
+      if(heatmap) {
+        heatmap.visible = false;
+      }
+    }
+
     function drawMap() {
       //var data = google.visualization.arrayToDataTable(processData(stuff));
       initializeMap();
       addHeatMap();
-      alert('hi');
-      addDotsToMap();
       /*
       map = new google.visualization.Map($('#map_div')[0]);
       map.draw(data, {showTip: true, mapType: 'normal'});
@@ -156,6 +161,13 @@
       });
     });
 
+    function removeDotsFromMap() {
+      for(var i = 0; i < markersArray.length; i++) {
+        if(markersArray[i]) markersArray[i].setMap(null);
+      }
+      markersArray = [];
+    }
+
     function addDotsToMap() {
       var data = stuff;
       var locations = [];
@@ -173,6 +185,7 @@
           position: new google.maps.LatLng(locations[i][1], locations[i][2]),
           map: map
         });
+        markersArray.push(marker);
 
         google.maps.event.addListener(marker, 'click', (function(marker, i) {
           return function() {
@@ -188,7 +201,7 @@
 
 
       var myMap = new google.maps.Map(document.getElementById('map_div'), {
-        zoom: 14,
+        zoom: 12,
         center: new google.maps.LatLng(43.6529, -79.40124),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
@@ -197,10 +210,14 @@
     }
 
     function toggleHeatmap() {
-      if(document.getElementById('heatmap').checked) {
-        addHeatMap();
+      if(heatmap) heatmap.toggle();
+    }
+
+    function toggleDots() {
+      if(!document.getElementById('dots').checked) {
+        removeDotsFromMap();
       } else {
-        initializeMap();
+        addDotsToMap();
       }
     }
 
@@ -222,6 +239,7 @@
 	</form>
     <div id="map_div" style="width: 75%; height: 75%"></div>
     <input id='heatmap' type="checkbox" onclick='toggleHeatmap()'>Heatmap</input>
+    <input id='dots' type='checkbox' onclick='toggleDots()'>Dots</input>
     <div id="list"></div>
   </body>
 </html>
