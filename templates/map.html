@@ -4,7 +4,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script type="text/javascript">
 
-    var stuff;
+    var stuff,
+        map;
+
+    /**
+     * getUserCoordinates - use geolocation to grab the user's latitude and longitude
+     * @callback - when all is done, callback(lat, lon) is called
+     */
+    function getUserCoordinates(callback) {
+      navigator.geolocation.getCurrentPosition(function(location) {
+        callback(location.coords.latitude, location.coords.longitude);
+      });
+    }
 
 	  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
   		var R = 6371; // Radius of the earth in km
@@ -72,10 +83,22 @@
       	console.log(shit);
       };
 
+    function addLocator(lat, lon) {
+      var pos = new google.maps.LatLng(lat, lon);
+      var imgName = 'you.png';
+      var marker = new google.maps.Marker({
+        position: pos,
+        map: map,
+        icon: imgName,
+        title: "You are here"
+      })
+    }
+
     function drawMap() {
       var data = google.visualization.arrayToDataTable(processData(stuff));
-      var map = new google.visualization.Map($('#map_div')[0]);
-      map.draw(data, {showTip: true});
+      map = new google.visualization.Map($('#map_div')[0]);
+      map.draw(data, {showTip: true, mapType: 'normal'});
+      getUserCoordinates(addLocator);
     };
 
       $(function(){
