@@ -23,32 +23,44 @@
 	  	return deg * (Math.PI/180)
 	  };
 
-    function getData(){
-    	var jData = $.ajax({
-        dataType: "json",
-        url: "/get_drinks_json",
-        async: false
-      });
-      var rText = jData.responseText;
-      return JSON.parse(rText)['json-data'];
-    };
+      function getData(){
+      	var jData = $.ajax({
+          dataType: "json",
+          url: "/get_drinks_json",
+          async: false
+        });
+        var rText = jData.responseText;
+        return JSON.parse(rText)['json-data'];
+      };
 
-    function processData(deals){
-      var googleData = [['Lat', 'Lon', 'Info']]
-      for(var i = 0; i < deals.length; i++) {
-        var deal = deals[i];
-        var info = "";
-        info += "bar_name: " + deal[4] + "\n";
-        info += "drink_name: " + deal[2] + "\n";
-        info += "price: " + deal[1] + "\n";
-        info += "category: " + deal[3];
-        googleData.push([deal[5], deal[6], info]);
-      }
-      return googleData;
-    };
+      function processData(deals){
+        var googleData = [['Lat', 'Lon', 'Info']]
+        for(var i = 0; i < deals.length; i++) {
+          var deal = deals[i];
+          var info = "";
+          info += "bar_name: " + deal[4] + "\n";
+          info += "drink_name: " + deal[2] + "\n";
+          info += "price: " + deal[1] + "\n";
+          info += "category: " + deal[3];
+          googleData.push([deal[5], deal[6], info]);
+        }
+        return googleData;
+      };
 
-    function filter(locx,locy,spend,category,distance){
-    	/*Turn street address into lat and long*/
+      function filter(street1,street2,spend,category,distance){
+      	/*Turn street address into lat and long*/
+        var curx = ;
+        var cury = ;
+
+      	/*filter list of shit*/
+      	shit = [];
+      	for (bar in stuff){
+          if (getDistanceFromLatLonInKm(curx,bar[5],cury,bar[6]) < distance && category == bar[3] && spend == bar[1]){
+            shit.push(bar);
+          }
+      	}
+      	console.log(shit);
+      };
 
     	/*filter list of shit*/
     	shit = [];
@@ -64,9 +76,10 @@
       map.draw(data, {showTip: true});
     };
 
-    $(function(){
-	    $('form').submit(function(e){
-			  filter($('#locx').val(),$('#locy').val(),parseInt($('#spend').val()),parseInt($('#category').val()),parseInt($('#distance').val()));
+      $(function(){
+	      $('form').submit(function(e){
+
+			filter($('#street1').val(),$('#street2').val(),parseFloat($('#spend').val()),parseInt($('#category').val()),parseFloat($('#distance').val()));
 	    	e.preventDefault();
 		  });
 		});
@@ -79,10 +92,10 @@
 
   <body>
   	<form>
-		Street1: <input type="text" id="locx" name="locx">
-		Street2: <input type="text" id="locy" name="locy">
+		Street1: <input type="text" id="street1" name="locx">
+		Street2: <input type="text" id="street2" name="locy">
 		Spend: <input type="text" id="spend" name="spend">
-		distance: <input type="text" id="distance" name="distance">
+		Distance (KM): <input type="text" id="distance" name="distance">
 		Category: <input type="text" id="cat" name="cat">
 		<input id="beer_submit" type="submit" value="submit" />
 	</form>
